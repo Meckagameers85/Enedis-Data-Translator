@@ -1,37 +1,7 @@
-import csv
+
 import tkinter as tk
 from tkinter import ttk, filedialog
-
 path_fichier, path_dossier = "", ""
-fichier, dossier = "", ""
-
-def get_data(path):
-    data = ""
-    Exit_Data = [["Horodate", "Valeur"]]
-    with open(path, "r") as file:
-        data = file.read()
-    data = data.split('"points":')[1]
-    data = data.replace("]}]}]}", "]")
-    data = data.replace("}, {", "},{")
-    data = data.replace("} ,{", "},{")
-    datas = data.split("},{")
-    for i in range(len(datas)):
-        ligne = []
-        ligne = datas[i].split(",")
-        ligne = ligne[:2]
-        Exit_Data.append([ligne[1].split('"')[3], ligne[0].split('"')[3]])
-    return Exit_Data
-
-def translate_CSV():
-    global path_fichier, path_dossier, fichier, dossier
-    if path_fichier and path_dossier:
-        data = get_data(path_fichier)
-        path = path_dossier + "/" + fichier[:-4] + "_traduit.csv"
-        with open(path, 'w', newline='', encoding='utf-8') as fichier_csv:
-            writer = csv.writer(fichier_csv, delimiter=';')
-            writer.writerows(data)
-        print("Traduction terminée avec succès.")
-        fenetre.destroy()
 
 def choisir_fichier():
     global fichier, path_fichier
@@ -45,13 +15,16 @@ def choisir_dossier():
     dossier = path_dossier.split("/")[-1]
     mettre_a_jour_etat_bouton()
 
-def mettre_a_jour_etat_bouton():
-    if path_fichier != "":
-        label_fichier.config(text=f"Fichier: {fichier}")
-    if path_dossier != "":
-        label_dossier.config(text=f"Dossier: {dossier}")
+def afficher_fichier():
+    fenetre.destroy()
 
-    if path_fichier != "" and path_dossier != "":
+def mettre_a_jour_etat_bouton():
+    if path_fichier!="":
+        label_fichier.config(text=f"Fichier: {fichier}")
+    if path_dossier!="":
+        label_dossier.config(text=f"Dossier: {dossier}")
+    
+    if path_fichier!="" and path_dossier!="":
         btn_afficher['state'] = 'normal'
     else:
         btn_afficher['state'] = 'disabled'
@@ -82,7 +55,7 @@ label_dossier = ttk.Label(fenetre, text="Dossier :")
 label_dossier.pack(pady=10)
 
 # Bouton pour afficher les fichiers et dossiers sélectionnés
-btn_afficher = ttk.Button(fenetre, text="Traduire", command=translate_CSV, state='disabled')
+btn_afficher = ttk.Button(fenetre, text="Traduire", command=afficher_fichier, state='disabled')
 btn_afficher.pack(pady=10)
 
 # Lancer la boucle principale
