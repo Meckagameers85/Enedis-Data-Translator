@@ -1,15 +1,18 @@
 import csv
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, messagebox
+
 
 path_fichier, path_dossier = "", ""
 fichier, dossier = "", ""
 
 def get_data(path):
+    global path_fichier,fichier
     data = ""
-    Exit_Data = [["Horodate", "Valeur"]]
+    Exit_Data = [["Horodate", "Valeur","test"]]
     with open(path, "r") as file:
         data = file.read()
+    print(data.split('"points":')[0])
     data = data.split('"points":')[1]
     data = data.replace("]}]}]}", "]")
     data = data.replace("}, {", "},{")
@@ -24,19 +27,32 @@ def get_data(path):
 
 def translate_CSV():
     global path_fichier, path_dossier, fichier, dossier
-    if path_fichier and path_dossier:
+    if path_fichier !="" and path_dossier != "":
         data = get_data(path_fichier)
         path = path_dossier + "/" + fichier[:-4] + "_traduit.csv"
         with open(path, 'w', newline='', encoding='utf-8') as fichier_csv:
             writer = csv.writer(fichier_csv, delimiter=';')
             writer.writerows(data)
-        print("Traduction terminée avec succès.")
+        messagebox.showinfo("Traduction", "Traduction terminée !")
         fenetre.destroy()
 
 def choisir_fichier():
     global fichier, path_fichier
+    data = ""
     path_fichier = filedialog.askopenfilename(title="Choisir un fichier")
     fichier = path_fichier.split("/")[-1]
+    if fichier[-5:] != ".json":
+        messagebox.showerror("Erreur", "Le fichier doit être au format .csv !")
+        path_fichier = ""
+        fichier = ""
+        
+    else :
+        with open(path_fichier, "r") as file:
+            data = file.read()
+        if '"points":' not in data:
+            messagebox.showerror("Erreur", "Le fichier ne contient pas de données !")
+            path_fichier = ""
+            fichier = ""
     mettre_a_jour_etat_bouton()
 
 def choisir_dossier():
