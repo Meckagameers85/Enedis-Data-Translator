@@ -9,11 +9,26 @@ fichier, dossier = "", ""
 def get_data(path):
     global path_fichier,fichier
     data = ""
-    Exit_Data = [["Horodate", "Valeur","test"]]
+    header = ""
+    dico_Header = {"CONS": "Consommation","BRUT":"Comptage Brut"}
     with open(path, "r") as file:
         data = file.read()
-    print(data.split('"points":')[0])
-    data = data.split('"points":')[1]
+    header,data = data.split('"points":')
+    
+    #data: "mesures":[{...},{...},{...}]}
+    header = header.split('"mesures":[{')[1]
+    header = header.split(",")
+    Exit_Data = [["Identifiant PRM", "Date de debut","Date de fin","Grandeur metier","Etape metier","Unite"]]
+    Exit_Data.append([header[0].split('"idPrm":"')[1][:-1],
+                      header[2].split('"dateDebut":"')[1][:-10],
+                      header[3].split('"dateFin":"')[1][:-11],
+                      dico_Header[header[5].split('"grandeur":[{"grandeurMetier":"')[1][:-1]],
+                      dico_Header[header[1].split('"etapeMetier":"')[1][:-1]],
+                      header[7].split('"unite":"')[1][:-1]
+                      ])
+    
+    #data: "points":[{...},{...},{...}]header
+    Exit_Data.append(["Horodate", "Valeur","","","",""])
     data = data.replace("]}]}]}", "]")
     data = data.replace("}, {", "},{")
     data = data.replace("} ,{", "},{")
@@ -22,7 +37,7 @@ def get_data(path):
         ligne = []
         ligne = datas[i].split(",")
         ligne = ligne[:2]
-        Exit_Data.append([ligne[1].split('"')[3], ligne[0].split('"')[3]])
+        Exit_Data.append([ligne[1].split('"')[3], ligne[0].split('"')[3],"","","",""])
     return Exit_Data
 
 def translate_CSV():
@@ -42,7 +57,7 @@ def choisir_fichier():
     path_fichier = filedialog.askopenfilename(title="Choisir un fichier")
     fichier = path_fichier.split("/")[-1]
     if fichier[-5:] != ".json":
-        messagebox.showerror("Erreur", "Le fichier doit être au format .csv !")
+        messagebox.showerror("Erreur", "Le fichier doit être au format .json")
         path_fichier = ""
         fichier = ""
         
@@ -50,7 +65,7 @@ def choisir_fichier():
         with open(path_fichier, "r") as file:
             data = file.read()
         if '"points":' not in data:
-            messagebox.showerror("Erreur", "Le fichier ne contient pas de données !")
+            messagebox.showerror("Erreur", "Le fichier ne contient pas de données")
             path_fichier = ""
             fichier = ""
     mettre_a_jour_etat_bouton()
