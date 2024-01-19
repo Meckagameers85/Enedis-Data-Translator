@@ -118,3 +118,5 @@ btn_afficher.pack(pady=10)
 
 # Lancer la boucle principale
 fenetre.mainloop()
+
+#pyinstaller --onefile --noconsole Main.py
